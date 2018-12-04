@@ -46,15 +46,15 @@ def seen(server, info, playername):
         msg = "{p} 没有在摸鱼".format(p=playername)
     else:
         ot = offlineTime(lastSeen)
-        msg = "{p} 已经摸了 {t}".format(p=playername, t=ot)
+        ft = formattedTime(ot)
+        msg = "{p} 已经摸了 {t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
 
 
 def offlineTime(lastSeen):
     now = time.time()
-    offline = now - lastSeen
-    return formattedTime(int(offline))
+    return now - lastSeen
     
 
 def formattedTime(t):
