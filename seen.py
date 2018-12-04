@@ -26,7 +26,7 @@ def onServerInfo(server, info):
     if not info.isPlayer:
         return
     
-    tokens = info.split()
+    tokens = info.content.split()
     command = tokens[0]
     args = tokens[1:]
 
