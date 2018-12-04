@@ -31,7 +31,6 @@ def onServerInfo(server, info):
     args = tokens[1:]
 
     if command == '!!seen':
-        server.say('seen')
         if args:
             playername = args[0]
             seen(server, info, playername)
