@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import datetime
 
 
 helpmsg = '''------MCD SEEN插件------
@@ -52,9 +51,8 @@ def seen(server, info, playername):
 
 
 def offlineTime(lastSeen):
-    lastSeen = datetime.datetime.fromtimestamp(lastSeen)
-    now = datetime.datetime.now()
-    offline = (now - lastSeen).total_seconds()
+    now = time.time()
+    offline = now - lastSeen
     return formattedTime(int(offline))
     
 
