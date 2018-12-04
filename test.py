@@ -48,8 +48,7 @@ def seen(server, info, playername):
         ot = offlineTime(lastSeen)
         msg = "{p} 已经摸了 {t}".format(p=playername, t=ot)
 
-    # server.tell(info.player, msg)
-    print(msg)
+    server.tell(info.player, msg)
 
 
 def offlineTime(lastSeen):
@@ -72,13 +71,13 @@ def formattedTime(t):
             break
     if t != 0:
         # Time large enough
-        values.append(value)
+        values.append(t)
 
     s = ""
     for i in range(len(values)):
         value = values[i]
         unit = units[i]
-        s = "{v} {u} ".format(v=value, u=unit)
+        s = "{v} {u} ".format(v=value, u=unit) + s 
     return s
 
 
@@ -120,3 +119,9 @@ def saveSeens(seens):
     with open("seen.json", "w") as f:
         jsonSeens = json.dumps(seens)
         f.write(jsonSeens)
+
+
+if __name__ == "__main__":
+    t = time.time()
+    print(t)
+    print(formattedTime(int(t)))
