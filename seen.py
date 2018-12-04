@@ -41,13 +41,13 @@ def onServerInfo(server, info):
 def seen(server, info, playername):
     lastSeen = lastSeenTime(playername)
     if lastSeen == "no data":
-        msg = "没有 {p} 的数据".format(p=playername)
+        msg = "没有 §e{p}§r 的数据".format(p=playername)
     elif lastSeen == "online":
-        msg = "{p} 没有在摸鱼".format(p=playername)
+        msg = "§e{p}§r 没有在摸鱼".format(p=playername)
     else:
         ot = offlineTime(lastSeen)
         ft = formattedTime(ot)
-        msg = "{p} 已经摸了 {t}".format(p=playername, t=ft)
+        msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
 
