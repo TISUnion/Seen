@@ -31,6 +31,7 @@ def onServerInfo(server, info):
     args = tokens[1:]
 
     if command == '!!seen':
+        server.say('seen')
         if args:
             playername = args[0]
             seen(server, info, playername)
@@ -90,7 +91,8 @@ def lastSeenTime(playername):
 
 
 def seenHelp(server, player):
-    server.tell(player, helpmsg)
+    for line in helpmsg.splitlines():
+        server.tell(player, line)
 
 
 def setSeen(playername, seen):
