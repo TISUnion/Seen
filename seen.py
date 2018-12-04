@@ -46,7 +46,7 @@ def seen(server, info, playername):
         msg = "§e{p}§r 没有在摸鱼".format(p=playername)
     else:
         ot = offlineTime(lastSeen)
-        ft = formattedTime(ot)
+        ft = formattedTime(int(ot))
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
