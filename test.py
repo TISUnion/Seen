@@ -119,9 +119,3 @@ def saveSeens(seens):
     with open("seen.json", "w") as f:
         jsonSeens = json.dumps(seens)
         f.write(jsonSeens)
-
-
-if __name__ == "__main__":
-    t = time.time()
-    print(t)
-    print(formattedTime(int(t)))
