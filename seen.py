@@ -30,14 +30,12 @@ def onServerInfo(server, info):
     command = tokens[0]
     args = tokens[1:]
 
-    if command != '!!seen':
-        return
-
-    if args:
-        playername = args[0]
-        seen(server, info, playername)
-    else:
-        seenHelp(server, info.player)
+    if command == '!!seen':
+        if args:
+            playername = args[0]
+            seen(server, info, playername)
+        else:
+            seenHelp(server, info.player)
 
 
 def seen(server, info, playername):
