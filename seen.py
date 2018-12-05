@@ -19,7 +19,8 @@ def onPlayerLeave(server, playername):
 
 
 def onPlayerJoin(server, playername):
-    setSeen(playername, 'online')
+    t = -time.time()
+    setSeen(playername, t)
 
 
 def onServerInfo(server, info):
@@ -42,9 +43,11 @@ def seen(server, info, playername):
     lastSeen = lastSeenTime(playername)
     if lastSeen == "no data":
         msg = "没有 §e{p}§r 的数据".format(p=playername)
-    elif lastSeen == "online":
-        msg = "§e{p}§r 没有在摸鱼".format(p=playername)
-    else:
+    elif lastSeen < 0:
+        ot = onlineTime(lastSeen)
+        ft = formattedTime(int(ot))
+        msg = "§e{p}§r 没有在摸鱼, 已经肝了 §{t}".format(p=playername, t=ft)
+    elif lastSeen >= 0:
         ot = offlineTime(lastSeen)
         ft = formattedTime(int(ot))
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
@@ -55,6 +58,11 @@ def seen(server, info, playername):
 def offlineTime(lastSeen):
     now = time.time()
     return now - lastSeen
+
+
+def onlineTime(lastSeen):
+    now = time.time()
+    return now - (-lastSeen)
     
 
 def formattedTime(t):
