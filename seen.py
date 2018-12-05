@@ -46,7 +46,7 @@ def seen(server, info, playername):
     elif lastSeen < 0:
         ot = onlineTime(lastSeen)
         ft = formattedTime(int(ot))
-        msg = "§e{p}§r 没有在摸鱼, 已经肝了 §{t}".format(p=playername, t=ft)
+        msg = "§e{p}§r 没有在摸鱼, 已经肝了 §6{t}".format(p=playername, t=ft)
     elif lastSeen >= 0:
         ot = offlineTime(lastSeen)
         ft = formattedTime(int(ot))
