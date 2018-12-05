@@ -68,7 +68,7 @@ def deltaTime(lastSeen):
 def formattedTime(t):
     t = int(t)
     values = []
-    units = ["秒", "分钟", "小时", "天"]
+    units = ["秒", "分", "小时", "天"]
     scales = [60, 60, 24]
     for scale in scales:
         value = t % scale
