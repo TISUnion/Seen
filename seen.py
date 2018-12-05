@@ -61,11 +61,13 @@ def nowTime():
 
 
 def offlineTime(lastSeen):
+    lastSeen = int(lastSeen)
     now = nowTime()
     return now - lastSeen
 
 
 def onlineTime(lastSeen):
+    lastSeen = int(lastSeen)
     now = nowTime()
     return now - (-lastSeen)
 
