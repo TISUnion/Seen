@@ -44,12 +44,12 @@ def seen(server, info, playername):
     if lastSeen == "no data":
         msg = "没有 §e{p}§r 的数据".format(p=playername)
     elif lastSeen < 0:
-        ot = onlineTime(lastSeen)
-        ft = formattedTime(ot)
-        msg = "§e{p}§r 没有在摸鱼, 已经肝了 §6{t}".format(p=playername, t=ft)
+        dt = deltaTime(lastSeen)
+        ft = formattedTime(dt)
+        msg = "§e{p}§r 没有在摸鱼, 已经肝了 §a{t}".format(p=playername, t=ft)
     elif lastSeen >= 0:
-        ot = offlineTime(lastSeen)
-        ft = formattedTime(ot)
+        dt = deltaTime(lastSeen)
+        ft = formattedTime(dt)
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
@@ -60,19 +60,13 @@ def nowTime():
     return int(t)
 
 
-def offlineTime(lastSeen):
-    lastSeen = int(lastSeen)
+def deltaTime(lastSeen):
     now = nowTime()
-    return now - lastSeen
-
-
-def onlineTime(lastSeen):
-    lastSeen = int(lastSeen)
-    now = nowTime()
-    return now - (-lastSeen)
+    return now - abs(lastSeen)
 
 
 def formattedTime(t):
+    t = int(t)
     values = []
     units = ["秒", "分钟", "小时", "天"]
     scales = [60, 60, 24]
