@@ -10,6 +10,7 @@ helpmsg = '''------MCD SEEN插件------
 命令帮助如下:
 !!seen 显示帮助信息
 !!seen [玩家] - 查看玩家摸鱼时长
+!!liver 查看所有在线玩家爆肝时长
 --------------------------------'''
 
 
@@ -38,6 +39,10 @@ def onServerInfo(server, info):
         else:
             seenHelp(server, info.player)
 
+    if command == '!!liver':
+        liver(server, info)
+
+
 
 def seen(server, info, playername):
     lastSeen = lastSeenTime(playername)
@@ -53,6 +58,18 @@ def seen(server, info, playername):
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
+
+
+def liver(server, info):
+    seens = seensFromFile()
+    players = seens.keys()
+    for player in players:
+        seen = seens[player]
+        if seen < 0:
+            dt = deltaTime(seen)
+            ft = formattedTime(dt)
+            msg = "§e{p}§r 已经肝了 §a{t}".format(p=player, t=ft)
+            server.tell(info.player, msg)
 
 
 def nowTime():
