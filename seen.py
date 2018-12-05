@@ -14,12 +14,12 @@ helpmsg = '''------MCD SEEN插件------
 
 
 def onPlayerLeave(server, playername):
-    t = time.time()
+    t = nowTime()
     setSeen(playername, t)
 
 
 def onPlayerJoin(server, playername):
-    t = -time.time()
+    t = -nowTime()
     setSeen(playername, t)
 
 
@@ -45,25 +45,30 @@ def seen(server, info, playername):
         msg = "没有 §e{p}§r 的数据".format(p=playername)
     elif lastSeen < 0:
         ot = onlineTime(lastSeen)
-        ft = formattedTime(int(ot))
+        ft = formattedTime(ot)
         msg = "§e{p}§r 没有在摸鱼, 已经肝了 §6{t}".format(p=playername, t=ft)
     elif lastSeen >= 0:
         ot = offlineTime(lastSeen)
-        ft = formattedTime(int(ot))
+        ft = formattedTime(ot)
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
 
 
+def nowTime():
+    t = time.time()
+    return int(t)
+
+
 def offlineTime(lastSeen):
-    now = time.time()
+    now = nowTime()
     return now - lastSeen
 
 
 def onlineTime(lastSeen):
-    now = time.time()
+    now = nowTime()
     return now - (-lastSeen)
-    
+
 
 def formattedTime(t):
     values = []
