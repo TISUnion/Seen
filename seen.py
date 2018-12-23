@@ -4,6 +4,7 @@
 import os
 import json
 import time
+import traceback
 
 
 helpmsg = '''------MCD SEEN插件------
@@ -14,14 +15,40 @@ helpmsg = '''------MCD SEEN插件------
 --------------------------------'''
 
 
+def tell(server, player, message):
+    for line in message.splitlines():
+        if line.startswith(u'/tellraw'.encode('utf-8')):
+            line = line.replace('{player}', player)
+            line = line.encode('utf-8')
+            server.execute(line)
+        else:
+            if isinstance(line, unicode):
+                line = line.encode('utf-8')
+            server.tell(player, line)
+
+
+def transform_seen_json():
+    seens = seens_from_file()
+    result = {}
+    for player, time in seens.items():
+        result[player] = {}
+        if time > 0:
+            result[player]['left'] = time
+            result[player]['joined'] = 0
+        else:
+            result[player]['left'] = 0
+            result[player]['joined'] = -time
+    save_seens(result)
+
+
 def onPlayerLeave(server, playername):
-    t = nowTime()
-    setSeen(playername, t)
+    t = now_time()
+    set_seen(playername, t, 'left')
 
 
 def onPlayerJoin(server, playername):
-    t = -nowTime()
-    setSeen(playername, t)
+    t = now_time()
+    set_seen(playername, t, 'joined')
 
 
 def onServerInfo(server, info):
@@ -32,57 +59,79 @@ def onServerInfo(server, info):
     command = tokens[0]
     args = tokens[1:]
 
-    if command == '!!seen':
-        if args:
-            playername = args[0]
-            seen(server, info, playername)
-        else:
-            seenHelp(server, info.player)
+    try:
+        if command == '!!seen':
+            if args:
+                playername = args[0]
+                seen(server, info, playername)
+            else:
+                seen_help(server, info.player)
 
-    if command == '!!liver':
-        liver(server, info)
+        if command == '!!liver':
+            liver(server, info)
+
+        if command == '!!seen-reinit':
+            # init_file()
+            transform_seen_json()
+
+        if command == '!!seen-show':
+            seens = seens_from_file()
+            tell(server, info.player, str(seens))
+
+        if command == '!!seen-set':
+            t = now_time()
+            set_seen('SeekSun', t, 'left')
+    except:
+        f = traceback.format_exc()
+        tell(server, info.player, f)
 
 
 
 def seen(server, info, playername):
-    lastSeen = lastSeenTime(playername)
-    if lastSeen == "no data":
+    joined, left = player_seen(playername)
+    if left and joined == 0:
         msg = "没有 §e{p}§r 的数据".format(p=playername)
-    elif lastSeen < 0:
-        dt = deltaTime(lastSeen)
-        ft = formattedTime(dt)
+    elif left < joined:
+        dt = delta_time(joined)
+        ft = formatted_time(dt)
         msg = "§e{p}§r 没有在摸鱼, 已经肝了 §a{t}".format(p=playername, t=ft)
-    elif lastSeen >= 0:
-        dt = deltaTime(lastSeen)
-        ft = formattedTime(dt)
+    elif left > joined:
+        dt = delta_time(left)
+        ft = formatted_time(dt)
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
 
     server.tell(info.player, msg)
 
 
 def liver(server, info):
-    seens = seensFromFile()
+    seens = seens_from_file()
     players = seens.keys()
+
+    result = []
     for player in players:
-        seen = seens[player]
-        if seen < 0:
-            dt = deltaTime(seen)
-            ft = formattedTime(dt)
-            msg = "§e{p}§r 已经肝了 §a{t}".format(p=player, t=ft)
-            server.tell(info.player, msg)
+        joined, left = player_seen(player)
+        if left < joined:
+            result.append([joined, player])
+    result.sort()
+    for r in result:
+        joined, player = r
+        dt = delta_time(joined)
+        ft = formatted_time(dt)
+        msg = "§e{p}§r 已经肝了 §a{t}".format(p=player, t=ft)
+        server.tell(info.player, msg)
 
 
-def nowTime():
+def now_time():
     t = time.time()
     return int(t)
 
 
-def deltaTime(lastSeen):
-    now = nowTime()
-    return now - abs(lastSeen)
+def delta_time(last_seen):
+    now = now_time()
+    return now - abs(last_seen)
 
 
-def formattedTime(t):
+def formatted_time(t):
     t = int(t)
     values = []
     units = ["秒", "分", "小时", "天"]
@@ -106,42 +155,50 @@ def formattedTime(t):
     return s
 
 
-def lastSeenTime(playername):
-    seens = seensFromFile()
-    playernames = seens.keys()
-    if playername in playernames:
-        return seens[playername]
+def player_seen(playername):
+    seens = seens_from_file()
+    seen = seens.get(playername, 0)
+    if seen:
+        joined = seen.get('joined', 0)
+        left = seen.get('left', 0)
+        return joined, left
     else:
-        return "no data"
+        return 0, 0
 
-
-def seenHelp(server, player):
+def seen_help(server, player):
     for line in helpmsg.splitlines():
         server.tell(player, line)
 
 
-def setSeen(playername, seen):
-    seens = seensFromFile()
-    seens[playername] = seen
-    saveSeens(seens)
+def set_seen(playername, time, type):
+    seens = seens_from_file()
+    player = seens.get(playername)
+    if not player:
+        seens[playername] = {
+            'joined': 0,
+            'left': 0,
+        }
+    seens[playername][type] = time
+
+    save_seens(seens)
 
 
-def initFile():
+def init_file():
     with open("seen.json", "w") as f:
         d = {}
         s = json.dumps(d)
         f.write(s)
 
 
-def seensFromFile():
+def seens_from_file():
     if not os.path.exists("seen.json"):
-        initFile()
+        init_file()
     with open("seen.json", "r") as f:
         seens = json.load(f)
     return seens
 
 
-def saveSeens(seens):
+def save_seens(seens):
     with open("seen.json", "w") as f:
-        jsonSeens = json.dumps(seens)
-        f.write(jsonSeens)
+        json_seens = json.dumps(seens)
+        f.write(json_seens)
