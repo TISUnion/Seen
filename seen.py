@@ -4,7 +4,6 @@
 import os
 import json
 import time
-import traceback
 
 
 helpmsg = '''------MCD SEEN插件------
@@ -28,20 +27,6 @@ def tell(server, player, message):
             server.tell(player, line)
 
 
-def transform_seen_json():
-    seens = seens_from_file()
-    result = {}
-    for player, time in seens.items():
-        result[player] = {}
-        if time > 0:
-            result[player]['left'] = time
-            result[player]['joined'] = 0
-        else:
-            result[player]['left'] = 0
-            result[player]['joined'] = -time
-    save_seens(result)
-
-
 def onPlayerLeave(server, playername):
     t = now_time()
     set_seen(playername, t, 'left')
@@ -55,40 +40,26 @@ def onPlayerJoin(server, playername):
 def onServerInfo(server, info):
     if not info.isPlayer:
         return
-    
+
     tokens = info.content.split()
     command = tokens[0]
     args = tokens[1:]
 
-    try:
-        if command == '!!seen':
-            if args:
-                playername = args[0]
-                seen(server, info, playername)
-            else:
-                seen_help(server, info.player)
+    # try:
+    if command == '!!seen':
+        if args:
+            playername = args[0]
+            seen(server, info, playername)
+        else:
+            seen_help(server, info.player)
+    elif command == '!!liver':
+        liver(server, info)
+    elif command == '!!seen-top':
+        seen_top(server, info)
 
-        if command == '!!liver':
-            liver(server, info)
-
-        if command == '!!seen-top':
-            seen_top(server, info)
-
-        if command == '!!seen-reinit':
-            # init_file()
-            transform_seen_json()
-
-        if command == '!!seen-show':
-            seens = seens_from_file()
-            tell(server, info.player, str(seens))
-
-        if command == '!!seen-set':
-            t = now_time()
-            set_seen('SeekSun', t, 'left')
-    except:
-        f = traceback.format_exc()
-        tell(server, info.player, f)
-
+    # except:
+    #     f = traceback.format_exc()
+    #     tell(server, info.player, f)
 
 
 def seen(server, info, playername):
@@ -175,7 +146,7 @@ def formatted_time(t):
     for i in range(len(values)):
         value = values[i]
         unit = units[i]
-        s = "{v} {u} ".format(v=value, u=unit) + s 
+        s = "{v} {u} ".format(v=value, u=unit) + s
     return s
 
 
@@ -188,6 +159,7 @@ def player_seen(playername):
         return joined, left
     else:
         return 0, 0
+
 
 def seen_help(server, player):
     for line in helpmsg.splitlines():
