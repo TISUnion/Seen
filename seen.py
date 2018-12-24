@@ -11,6 +11,7 @@ helpmsg = '''------MCD SEEN插件------
 命令帮助如下:
 !!seen 显示帮助信息
 !!seen [玩家] - 查看玩家摸鱼时长
+!!seen-top 查看摸鱼榜
 !!liver 查看所有在线玩家爆肝时长
 --------------------------------'''
 
@@ -70,6 +71,9 @@ def onServerInfo(server, info):
         if command == '!!liver':
             liver(server, info)
 
+        if command == '!!seen-top':
+            seen_top(server, info)
+
         if command == '!!seen-reinit':
             # init_file()
             transform_seen_json()
@@ -89,13 +93,13 @@ def onServerInfo(server, info):
 
 def seen(server, info, playername):
     joined, left = player_seen(playername)
-    if left and joined == 0:
+    if (left and joined) == 0:
         msg = "没有 §e{p}§r 的数据".format(p=playername)
     elif left < joined:
         dt = delta_time(joined)
         ft = formatted_time(dt)
         msg = "§e{p}§r 没有在摸鱼, 已经肝了 §a{t}".format(p=playername, t=ft)
-    elif left > joined:
+    elif left >= joined:
         dt = delta_time(left)
         ft = formatted_time(dt)
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
@@ -118,6 +122,26 @@ def liver(server, info):
         dt = delta_time(joined)
         ft = formatted_time(dt)
         msg = "§e{p}§r 已经肝了 §a{t}".format(p=player, t=ft)
+        server.tell(info.player, msg)
+
+
+def seen_top(server, info):
+    seens = seens_from_file()
+    players = seens.keys()
+
+    result = []
+    for player in players:
+        joined, left = player_seen(player)
+        if left > joined:
+            result.append([left, player])
+    result.sort()
+    top_num = min(len(result), 10)
+    for i in range(top_num):
+        r = result[i]
+        left, player = r
+        dt = delta_time(left)
+        ft = formatted_time(dt)
+        msg = "{i}. §e{p}§r 已经摸了 §6{t}".format(i=i+1, p=player, t=ft)
         server.tell(info.player, msg)
 
 
