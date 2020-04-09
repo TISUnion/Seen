@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-
+import copy
 import os
 import json
 import time
@@ -60,6 +59,26 @@ def onServerInfo(server, info):
     # except:
     #     f = traceback.format_exc()
     #     tell(server, info.player, f)
+
+
+# MCDR compatibility
+
+def on_load(server, old):
+    server.add_help_message('!!seen', '查看摸鱼榜/爆肝榜帮助')
+
+
+def on_player_joined(server, player):
+    onPlayerJoin(server, player)
+
+
+def on_player_left(server, player):
+    onPlayerLeave(server, player)
+
+
+def on_info(server, info):
+    info2 = copy.deepcopy(info)
+    info2.isPlayer = info2.is_player
+    onServerInfo(server, info2)
 
 
 def seen(server, info, playername):
