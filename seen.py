@@ -1,9 +1,17 @@
-# -*- coding: utf-8 -*-
-import copy
-import os
 import json
+import os
 import time
 
+PLUGIN_METADATA = {
+    'id': 'mcd_seen',
+    'version': '1.0.0',
+    'name': 'Seen and Liver',
+    'author': [
+        'Pandaria',
+        'Fallen_Breath',
+    ],
+    'link': 'https://github.com/TISUnion/Seen'
+}
 
 helpmsg = '''------MCD SEEN插件------
 命令帮助如下:
@@ -12,18 +20,6 @@ helpmsg = '''------MCD SEEN插件------
 !!seen-top 查看摸鱼榜
 !!liver 查看所有在线玩家爆肝时长
 --------------------------------'''
-
-
-def tell(server, player, message):
-    for line in message.splitlines():
-        if line.startswith(u'/tellraw'.encode('utf-8')):
-            line = line.replace('{player}', player)
-            line = line.encode('utf-8')
-            server.execute(line)
-        else:
-            if isinstance(line, unicode):
-                line = line.encode('utf-8')
-            server.tell(player, line)
 
 
 def onPlayerLeave(server, playername):
@@ -36,8 +32,8 @@ def onPlayerJoin(server, playername):
     set_seen(playername, t, 'joined')
 
 
-def onServerInfo(server, info):
-    if not info.isPlayer:
+def on_user_info(server, info):
+    if not info.is_player:
         return
 
     tokens = info.content.split()
@@ -64,21 +60,15 @@ def onServerInfo(server, info):
 # MCDR compatibility
 
 def on_load(server, old):
-    server.add_help_message('!!seen', '查看摸鱼榜/爆肝榜帮助')
+    server.register_help_message('!!seen', '查看摸鱼榜/爆肝榜帮助')
 
 
-def on_player_joined(server, player):
+def on_player_joined(server, player, info):
     onPlayerJoin(server, player)
 
 
 def on_player_left(server, player):
     onPlayerLeave(server, player)
-
-
-def on_info(server, info):
-    info2 = copy.deepcopy(info)
-    info2.isPlayer = info2.is_player
-    onServerInfo(server, info2)
 
 
 def seen(server, info, playername):
@@ -93,7 +83,8 @@ def seen(server, info, playername):
         dt = delta_time(left)
         ft = formatted_time(dt)
         msg = "§e{p}§r 已经摸了 §6{t}".format(p=playername, t=ft)
-
+    else:
+        raise ValueError()
     server.tell(info.player, msg)
 
 
