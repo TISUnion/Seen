@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import time
 
 PLUGIN_METADATA = {
@@ -190,21 +191,23 @@ def set_seen(playername, time, type):
 
 
 def init_file():
-    with open("seen.json", "w") as f:
+    with open("config/seen.json", "w") as f:
         d = {}
         s = json.dumps(d)
         f.write(s)
 
 
 def seens_from_file():
-    if not os.path.exists("seen.json"):
+    if os.path.isfile("seen.json"):
+        shutil.move("seen.json", "config/seen.json")
+    if not os.path.exists("config/seen.json"):
         init_file()
-    with open("seen.json", "r") as f:
+    with open("config/seen.json", "r") as f:
         seens = json.load(f)
     return seens
 
 
 def save_seens(seens):
-    with open("seen.json", "w") as f:
+    with open("config/seen.json", "w") as f:
         json_seens = json.dumps(seens)
         f.write(json_seens)
