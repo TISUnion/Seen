@@ -1,1 +1,45 @@
+mcd_seen.help_msg:
+  ------ MCDR {3} v{4} ------
+  A plugin to query players online and offline time.
+  §d【Command Help】§r
+  §7{0}§r Show this message.
+  §7{0}§r §e<player>§r Query player's on/offline time.
+  §7{1}§r Show the rank of offline time
+  §7{2}§r Show the rank of online time.
+  §d【Additional Arguments】§r
+  You can add more arguments when showing the ranks.
+  The data will not include bot if no more arguments given.
+  §e(Shadowing player will be proccessed as bot too.)§r
+  §6There is following arguments available:§6
+  The argument in same color mustn't be given in 1 command.
+  §6-all§r Show all the data.
+  §6-merge§r Show all the data (merging bot and player data)
+  §6-bot§r Show bot data only.
+  §e-full§r Can only be used on offline rank, Show all the data instead of top 10, §ebut may show too much message sometimes.
 
+# Plain text
+mcd_seen.text.reg_help_msg: View laziness & hardworking rank
+mcd_seen.text.player: player
+mcd_seen.text.bot: bot
+mcd_seen.text.seen: have been offline for
+mcd_seen.text.player_liver: have been online for
+mcd_seen.text.bot_liver: have been online for
+mcd_seen.text.top_normal: §dplayer only§r
+mcd_seen.text.top_bot: §5bot only§r
+mcd_seen.text.top_merge: §7all players§r/§emerged§r
+mcd_seen.text.top_all: §7all players§r
+
+# Hover texts
+mcd_seen.hover.help_msg_suggest: "Click to fill {}"
+mcd_seen.hover.query_player: "Click to query player {}"
+mcd_seen.hover.show_help: "Click to show help"
+
+# Format texts
+mcd_seen.fmt.delta_time: "sec min hrs day"
+mcd_seen.fmt.seen_top: "Here are the {} players §cofflined§r for the longest time({}):"
+mcd_seen.fmt.seen_top_full: "Here are all the players' offline time data({})"
+mcd_seen.fmt.liver_top: "Here are the players §acurrently online§r({}):"
+
+# Error texts
+mcd_seen.error.player_data_not_found: Player data not found! Click here for help
+mcd_seen.error.cmd_error: Command error! Click here for help

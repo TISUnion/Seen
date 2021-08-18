@@ -10,7 +10,7 @@
     ],
     "link": "https://github.com/TISUnion/Seen",
     "dependencies": {
-        "mcdreforged": "2.0.0-beta.12"
+        "mcdreforged": ">=2.0.0-beta.12"
     },
 
     "resources": [
