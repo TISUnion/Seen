@@ -1,0 +1,45 @@
+mcd_seen.help_msg: |
+  §7-----§r MCDR {3} v{4} §7-----§r
+  一个查看服务器玩家在线(爆肝)和下线(摸鱼)时间的插件
+  §d【指令说明】§r
+  §7{0}§r 显示帮助信息
+  §7{0}§r §e<玩家>§r 查看玩家摸鱼/爆肝时长
+  §7{1}§r 查看摸鱼榜
+  §7{2}§r 查看爆肝榜
+  §d【额外参数说明】§r
+  查看爆肝摸鱼榜时可添加额外参数
+  在不添加参数的情况下默认统计非假人玩家数据
+  (玩家shadow也算作假人处理)
+  参数如下所示：
+  同种颜色标注的参数不可叠加使用
+  §6-all§r 显示全部玩家统计数据(玩家同名假人会独立显示)
+  §6-merge§r 显示全部玩家统计数据(玩家和同名假人会合并显示)
+  §6-bot§r 仅显示假人的统计数据
+  §e-full§r 用于摸鱼榜，显示完整榜单(会刷屏, 慎用)
+
+# Plain text
+mcd_seen.text.reg_help_msg: 显示爆肝/摸鱼榜
+mcd_seen.text.player: 玩家
+mcd_seen.text.bot: 假人
+mcd_seen.text.seen: 已经摸了
+mcd_seen.text.player_liver: 已经肝了
+mcd_seen.text.bot_liver: 已经被压榨了
+mcd_seen.text.top_normal: §d仅真人玩家§r
+mcd_seen.text.top_bot: §5仅假人§r
+mcd_seen.text.top_merge: §7所有玩家§r/§e合并显示§r
+mcd_seen.text.top_all: §7所有玩家§r
+
+# Hover texts
+mcd_seen.hover.help_msg_suggest: "点击以填入§7{}§r"
+mcd_seen.hover.query_player: "点击以查询玩家§e{}§r的数据"
+mcd_seen.hover.show_help: "点击以获取插件帮助信息"
+
+# Format texts
+mcd_seen.fmt.delta_time: "秒 分 小时 天"
+mcd_seen.fmt.seen_top: "摸鱼榜前{}的§c鸽子§r({})如下: "
+mcd_seen.fmt.seen_top_full: "摸鱼榜全部§c鸽子§r({})如下: "
+mcd_seen.fmt.liver_top: "当前在线的§a肝帝§r({})如下: "
+
+# Error texts
+mcd_seen.error.player_data_not_found: 没有该玩家的数据
+mcd_seen.error.cmd_error: 指令有误! 点此获取帮助信息
