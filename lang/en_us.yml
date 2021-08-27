@@ -1,4 +1,4 @@
-mcd_seen.help_msg:
+mcd_seen.help_msg: |
   ------ MCDR {3} v{4} ------
   A plugin to query players online and offline time.
   §d【Command Help】§r

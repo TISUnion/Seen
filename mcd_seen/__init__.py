@@ -3,7 +3,7 @@ from mcdreforged.api.types import Info, PluginServerInterface
 from mcdreforged.api.decorator import new_thread
 
 from mcd_seen.constants import SEEN_PREFIX, META
-from mcd_seen.utils import verify_player_name, bot_name, tr, is_bot, logger
+from mcd_seen.utils import verify_player_name, bot_name, tr, logger
 from mcd_seen.storage import storage, bot_list
 from mcd_seen.config import config
 from mcd_seen.interface import register_command
@@ -29,7 +29,7 @@ def on_server_stop(*args, **kwargs):
     storage.correct([])
 
 
-@new_thread(META.id + '_PluginLoad')
+@new_thread(META.name + '_PluginLoad')
 def warn_first_load():
     logger.warning('Load Seen plugin when server is empty is suggested to make sure all the datas are right')
 
@@ -45,4 +45,5 @@ def on_load(server: PluginServerInterface, prev_module):
         except AttributeError:
             logger.info('Seems upgraded from a old version, welcome!')
     else:
-        warn_first_load()
+        if server.is_server_running():
+            warn_first_load()
