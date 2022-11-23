@@ -1,15 +1,13 @@
-import re
-
-from mcdreforged.api.types import CommandSource, PluginServerInterface
-from mcdreforged.api.command import *
-from mcdreforged.api.utils import Serializable
-from mcdreforged.api.rtext import *
 from typing import Callable, Any, List, Union, Optional
 
-from mcd_seen.storage import storage, PlayerSeen
-from mcd_seen.constants import *
+from mcdreforged.api.command import *
+from mcdreforged.api.rtext import *
+from mcdreforged.api.types import CommandSource, PluginServerInterface
+from mcdreforged.api.utils import Serializable
+
 from mcd_seen.config import config
-from mcd_seen.utils import tr, delta_time, formatted_time, bot_name
+from mcd_seen.storage import storage, PlayerSeen
+from mcd_seen.utils import tr, delta_time, bot_name, psi, ntr, htr, fmt_time_tr
 
 TOP_OPTIONS = {
         '-bot': 'bot',
@@ -36,7 +34,7 @@ class ExtraArguments(Serializable):
                 data[mode] = True
                 args.remove(arg)
         data = cls.deserialize(data)
-        # Confict check
+        # Conflict check
         if [data.all, data.merge, data.bot].count(True) > 1 or (data.full and liver) or (len(args) != 0):
             raise IllegalArgument(f'Illegal argument: {arg_string}', 1)
         if liver and not data.get_all:
@@ -55,7 +53,12 @@ class ExtraArguments(Serializable):
                 ret.append(tr(f'text.top_{o}'))
         if len(ret) == 0:
             ret.append(tr('text.top_normal'))
-        return '/'.join(ret).strip('/')
+        return RTextBase.join('/', ret)
+
+
+def reload_self(source: CommandSource):
+    psi.reload_plugin(psi.get_self_metadata().id)
+    source.reply(tr('text.reloaded'))
 
 
 def register_command(server: PluginServerInterface):
@@ -66,25 +69,31 @@ def register_command(server: PluginServerInterface):
 
     # !!seen
     server.register_command(
-        Literal(SEEN_PREFIX).on_child_error(CommandError, cmd_error, handled=True).runs(show_help).then(
+        Literal(config.seen_prefix).on_child_error(
+            CommandError, cmd_error, handled=True).runs(show_help).then(
+            Literal('reload').runs(reload_self)
+        ).then(
             QuotableText('player').runs(exe(seen))
         )
     )
     # !!seen-top
     server.register_command(
-        Literal(SEEN_TOP_PREFIX).on_child_error(CommandError, cmd_error, handled=True).runs(exe(seen_top, True)).then(
+        Literal(config.seen_top_prefix).on_child_error(
+            CommandError, cmd_error, handled=True).runs(exe(seen_top, True)).then(
             GreedyText('exarg').runs(exe(seen_top))
         )
     )
     # !!liver
     server.register_command(
-        Literal(LIVER_TOP_PREFIX).on_child_error(CommandError, cmd_error, handled=True).runs(exe(liver_top, True)).then(
+        Literal(config.liver_top_prefix).on_child_error(
+            CommandError, cmd_error, handled=True).runs(exe(liver_top, True)).then(
             QuotableText('exarg').runs(exe(liver_top))
         )
     )
-    if DEBUG_MODE:
+    if config.debug:
         server.register_command(
-            Literal(DEBUG_PREFIX).requires(lambda src: src.has_permission(4), lambda: 'Permission denied').then(
+            Literal(config.debug_prefix).requires(
+                lambda src: src.has_permission(4), lambda: 'Permission denied').then(
                 Literal('remove').then(
                     GreedyText('players').runs(exe(__remove_player_data))
                 )
@@ -93,49 +102,51 @@ def register_command(server: PluginServerInterface):
 
 
 def show_help(source: CommandSource):
-    help_message = tr(
-        'help_msg', SEEN_PREFIX, SEEN_TOP_PREFIX, LIVER_TOP_PREFIX, META.name, str(META.version)
-    ).strip().splitlines()
-    help_msg_rtext = ''
-    for line in help_message:
-        if help_msg_rtext != '':
-            help_msg_rtext += '\n'
-        for PREFIX in [SEEN_PREFIX, SEEN_TOP_PREFIX, LIVER_TOP_PREFIX]:
-            result = re.search(r'(?<=§7){}[\S ]*?(?=§)'.format(PREFIX), line)
-            if result is not None:
-                break
-        if result is not None:
-            cmd = result.group().strip() + ' '
-            help_msg_rtext += RText(line).c(RAction.suggest_command, cmd).h(
-                tr("hover.help_msg_suggest", cmd.strip()))
-        else:
-            help_msg_rtext += line
-    source.reply(help_msg_rtext)
+    meta = psi.get_self_metadata()
+    msg = htr(
+        'help_msg',
+        config.seen_prefix[0],
+        config.seen_top_prefix[0],
+        config.liver_top_prefix[0],
+        meta.name,
+        str(meta.version)
+    )
+    source.reply(msg)
 
 
 # Text layout
 def top(top_players: List[PlayerSeen], prefix: Union[RTextBase, str]):
-    ret, num = RTextList(prefix), 1
+    ret, num = [prefix], 1
     for p in top_players:
-        ret.append(f'\n{num}. ', seen_format(p))
+        ret.append(RTextList(f'{num}. ', seen_format(p)))
         num += 1
-    return ret
+    return RTextBase.join('\n', ret)
 
 
 def seen_format(player: PlayerSeen):
-    ret = ''
+    return tr('text', player=player).set_translator(seen_fmt_tr)
+
+
+def seen_fmt_tr(translation_key: str, player: PlayerSeen, language: Optional[str] = None, allow_failure: bool = True):
+    def ttr(key: str, *args, **kwargs):
+        return ntr(f'{translation_key}.{key}', *args, language=language, allow_failure=allow_failure, **kwargs)
+    ret = []
     # Bot/Player
-    ret += '§{}{}§e'.format('5' if player.is_bot else 'd',
-                            tr(f'text.{"bot" if player.is_bot else "player"}').capitalize())
+    color = '§5' if player.is_bot else '§d'
+    ret.append(f"{color}{ttr('bot' if player.is_bot else 'player').capitalize()}§r")
     # <player_name>
-    ret += f' §e{player.actual_name}§r '
+    ret.append(f'§e{player.actual_name}§r')
     # has been online/offline for
-    ret += tr(f'text.{"bot_liver" if player.is_bot else "player_liver"}') if player.online else tr('text.seen')
+    ret.append(ttr('bot_liver' if player.is_bot else 'player_liver') if player.online else ttr('seen'))
     # sec min hrs day
-    ret += formatted_time(delta_time(player.target))
-    return RText(ret).h(tr('hover.query_player', player.actual_name)).c(
-        RAction.run_command, '{} {}'.format(SEEN_PREFIX, player.actual_name)
+    ret.append(fmt_time_tr(
+        'mcd_seen.fmt.time_seen', t=delta_time(player.target), language=language, allow_failure=allow_failure))
+
+    ret = ' '.join(ret)
+    ret = RText(ret).h(tr('hover.query_player', player.actual_name)).c(
+        RAction.run_command, '{} {}'.format(config.seen_prefix[0], player.actual_name)
         )
+    return ret
 
 
 def seen(source: CommandSource, player: str):
@@ -163,7 +174,7 @@ def seen_top(source: CommandSource, exarg: str = None, liver: bool = False):
     # -full
     sorted_list = sorted_list if args.full else sorted_list[:config.seen_top_max]
     # get prefix
-    prefix = tr(f'fmt.seen_top{"_full" if args.full else ""}', config.seen_top_max, args.text)
+    prefix = tr(f'fmt.seen_top{"_full" if args.full else ""}', num=config.seen_top_max, arg=args.text)
     if liver:
         prefix = tr('fmt.liver_top', args.text)
 
@@ -176,10 +187,8 @@ def liver_top(source: CommandSource, exarg: str = None):
 
 def cmd_error(source: CommandSource):
     source.reply(
-        RText(
-            tr('mcd_seen.error.cmd_error'), color=RColor.red
-        ).c(
-            RAction.run_command, SEEN_PREFIX
+        tr('mcd_seen.error.cmd_error').set_color(color=RColor.red).c(
+            RAction.run_command, config.seen_prefix[0]
         ).h(
             tr('mcd_seen.hover.show_help')
         )
@@ -188,10 +197,8 @@ def cmd_error(source: CommandSource):
 
 def player_data_not_found(source: CommandSource):
     source.reply(
-        RText(
-            tr('mcd_seen.error.player_data_not_found'), color=RColor.red
-        ).c(
-            RAction.run_command, SEEN_PREFIX
+        tr('mcd_seen.error.player_data_not_found').set_color(color=RColor.red).c(
+            RAction.run_command, config.seen_prefix[0]
         ).h(
             tr('mcd_seen.hover.show_help')
         )

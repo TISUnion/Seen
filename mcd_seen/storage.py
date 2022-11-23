@@ -8,8 +8,8 @@ from typing import Dict, List, Iterable, Optional
 from mcdreforged.api.decorator import new_thread
 from mcdreforged.api.utils import Serializable
 
-from mcd_seen.constants import SEENS_FILE, META, SEENS_PATH_OLD
-from mcd_seen.utils import now_time, log_seen, logger, bot_name, is_bot
+from mcd_seen.constants import SEENS_FILE, SEENS_PATH_OLD
+from mcd_seen.utils import now_time, log_seen, logger, bot_name, is_bot, psi
 from mcd_seen.config import config
 
 bot_list = []
@@ -62,7 +62,7 @@ class SeenStorage:
     def __init__(self):
         self.data = {}      # type: Dict[str, PlayerSeen]
 
-    @new_thread(META.name + '_PlayerJoin')
+    @new_thread(psi.get_self_metadata().name + '_PlayerJoin')
     def player_joined(self, name: str, save=True):
         self[name].join()
         log_seen(f'Player {name} joined the game')
@@ -72,7 +72,7 @@ class SeenStorage:
         if save:
             self.save()
 
-    @new_thread(META.name + '_PlayerLeft')
+    @new_thread(psi.get_self_metadata().name + '_PlayerLeft')
     def player_left(self, name: str, save=True):
         if bot_name(name) in bot_list:
             name = bot_name(name)
@@ -82,7 +82,7 @@ class SeenStorage:
         if save:
             self.save()
 
-    @new_thread(META.name + '_Debug')
+    @new_thread(psi.get_self_metadata().name + '_Debug')
     def debug_remove(self, players: Iterable[str]):
         removed = []
         for p in players:
@@ -168,7 +168,7 @@ class SeenStorage:
     def get(self, name: str) -> Optional[PlayerSeen]:
         return self.lower_data.get(name.lower())
 
-    @new_thread(META.id + '_DataCorrect')
+    @new_thread(psi.get_self_metadata().id + '_DataCorrect')
     def correct(self, player_list: List[str]):
         for s in self.data.values():
             if s.online and s.actual_name not in player_list:

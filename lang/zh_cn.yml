@@ -28,6 +28,7 @@ mcd_seen.text.top_normal: §d仅真人玩家§r
 mcd_seen.text.top_bot: §5仅假人§r
 mcd_seen.text.top_merge: §7所有玩家§r/§e合并显示§r
 mcd_seen.text.top_all: §7所有玩家§r
+mcd_seen.text.reloaded: 插件已重载
 
 # Hover texts
 mcd_seen.hover.help_msg_suggest: "点击以填入§7{}§r"
@@ -35,10 +36,10 @@ mcd_seen.hover.query_player: "点击以查询玩家§e{}§r的数据"
 mcd_seen.hover.show_help: "点击以获取插件帮助信息"
 
 # Format texts
-mcd_seen.fmt.delta_time: "秒 分 小时 天"
-mcd_seen.fmt.seen_top: "摸鱼榜前{}的§c鸽子§r({})如下: "
-mcd_seen.fmt.seen_top_full: "摸鱼榜全部§c鸽子§r({})如下: "
-mcd_seen.fmt.liver_top: "当前在线的§a肝帝§r({})如下: "
+mcd_seen.fmt.time_seen: "秒 分 小时 天"
+mcd_seen.fmt.seen_top: "摸鱼榜前§6{num}§r的§c鸽子§r({arg})如下: "
+mcd_seen.fmt.seen_top_full: "摸鱼榜全部§c鸽子§r({arg})如下: "
+mcd_seen.fmt.liver_top: "当前在线的§a肝帝§r({arg})如下: "
 
 # Error texts
 mcd_seen.error.player_data_not_found: 没有该玩家的数据
