@@ -1,6 +1,6 @@
 {
     "id": "mcd_seen",
-    "version": "1.2.0-alpha.1",
+    "version": "1.2.0",
     "name": "Seen",
     "description": "Show laziness rank easily",
     "author": [
@@ -10,7 +10,7 @@
     ],
     "link": "https://github.com/TISUnion/Seen",
     "dependencies": {
-        "mcdreforged": ">=2.0.0-beta.12"
+        "mcdreforged": ">=2.1.0"
     },
 
     "resources": [
