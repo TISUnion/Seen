@@ -1,6 +1,6 @@
 {
     "id": "mcd_seen",
-    "version": "1.2.0",
+    "version": "1.2.1-alpha.1",
     "name": "Seen",
     "description": "Show laziness rank easily",
     "author": [

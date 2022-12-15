@@ -176,7 +176,7 @@ def seen_top(source: CommandSource, exarg: str = None, liver: bool = False):
     # get prefix
     prefix = tr(f'fmt.seen_top{"_full" if args.full else ""}', num=config.seen_top_max, arg=args.text)
     if liver:
-        prefix = tr('fmt.liver_top', args.text)
+        prefix = tr('fmt.liver_top', arg=args.text)
 
     source.reply(top(sorted_list, prefix=prefix))
 
