@@ -101,7 +101,7 @@ class SeenStorage:
             if not s.is_empty:
                 to_save[p] = s.serialize()
         with open(SEENS_FILE, 'w', encoding='UTF-8') as f:
-            json.dump(to_save, f, ensure_ascii=False)
+            json.dump(to_save, f, ensure_ascii=False, indent=4)
 
     def load(self):
         self.data = {}

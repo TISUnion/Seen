@@ -60,20 +60,23 @@ def verify_player_name(name: str) -> bool:
     return re.fullmatch(r'\w+', name) is not None
 
 
-def ntr(translation_key: str, *args, language: Optional[str] = None,
+def ntr(translation_key: str, *args, _mcdr_tr_language: Optional[str] = None, language: Optional[str] = None,
         allow_failure: bool = True, **kwargs) -> TextType:
     """
     Directly translate your keys to text
     :param translation_key: Your translation key
     :param args: Format args
-    :param language: Required language specified
+    :param language: Required language specified, deprecated in MCDReforged v2.12, migrate to _mcdr_tr_language
+    :param _mcdr_tr_language: Required language specified
     :param allow_failure: Allow failure to be thrown
     :param kwargs: Format kwargs
     :return: Your message text that can be processed by MCDReforged
     """
+    if _mcdr_tr_language is None:
+        _mcdr_tr_language = language
     try:
         return psi.tr(
-            translation_key, *args, language=language, allow_failure=False, **kwargs
+            translation_key, *args, _mcdr_tr_language=_mcdr_tr_language, allow_failure=False, **kwargs
         )
     except (KeyError, ValueError):
         fallback_language = psi.get_mcdr_language()
@@ -81,11 +84,11 @@ def ntr(translation_key: str, *args, language: Optional[str] = None,
             if fallback_language == 'en_us':
                 raise KeyError(translation_key)
             return psi.tr(
-                translation_key, *args, language='en_us', allow_failure=allow_failure, **kwargs
+                translation_key, *args, _mcdr_tr_language='en_us', allow_failure=allow_failure, **kwargs
             )
         except (KeyError, ValueError):
             languages = []
-            for item in (language, fallback_language, 'en_us'):
+            for item in (_mcdr_tr_language, fallback_language, 'en_us'):
                 if item not in languages:
                     languages.append(item)
             languages = ', '.join(languages)
@@ -145,11 +148,13 @@ def htr(translation_key: str, *args, **kwargs) -> RTextMCDRTranslation:
     return tr(translation_key, *args, **kwargs).set_translator(__htr)
 
 
-def fmt_time_tr(translation_key: str, t: Union[int, str], language: Optional[str] = None,
+def fmt_time_tr(translation_key: str, t: Union[int, str], _mcdr_tr_language: Optional[str] = None, language: Optional[str] = None,
                 allow_failure: bool = True) -> str:
+    if _mcdr_tr_language is None:
+        _mcdr_tr_language = language
     t = int(t)
     values = []
-    units = ntr(translation_key, language=language, allow_failure=allow_failure).split(' ')
+    units = ntr(translation_key, language=_mcdr_tr_language, allow_failure=allow_failure).split(' ')
     scales = [60, 60, 24]
 
     for scale in scales:

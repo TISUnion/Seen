@@ -127,9 +127,12 @@ def seen_format(player: PlayerSeen):
     return tr('text', player=player).set_translator(seen_fmt_tr)
 
 
-def seen_fmt_tr(translation_key: str, player: PlayerSeen, language: Optional[str] = None, allow_failure: bool = True):
+def seen_fmt_tr(translation_key: str, player: PlayerSeen, _mcdr_tr_language: Optional[str] = None, language: Optional[str] = None, allow_failure: bool = True):
+    if _mcdr_tr_language is None:
+        _mcdr_tr_language = language
+
     def ttr(key: str, *args, **kwargs):
-        return ntr(f'{translation_key}.{key}', *args, language=language, allow_failure=allow_failure, **kwargs)
+        return ntr(f'{translation_key}.{key}', *args, language=_mcdr_tr_language, allow_failure=allow_failure, **kwargs)
     ret = []
     # Bot/Player
     color = '§5' if player.is_bot else '§d'
@@ -140,7 +143,7 @@ def seen_fmt_tr(translation_key: str, player: PlayerSeen, language: Optional[str
     ret.append(ttr('bot_liver' if player.is_bot else 'player_liver') if player.online else ttr('seen'))
     # sec min hrs day
     ret.append(fmt_time_tr(
-        'mcd_seen.fmt.time_seen', t=delta_time(player.target), language=language, allow_failure=allow_failure))
+        'mcd_seen.fmt.time_seen', t=delta_time(player.target), _mcdr_tr_language=_mcdr_tr_language, allow_failure=allow_failure))
 
     ret = ' '.join(ret)
     ret = RText(ret).h(tr('hover.query_player', player.actual_name)).c(

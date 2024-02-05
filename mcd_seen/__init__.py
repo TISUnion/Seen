@@ -9,12 +9,18 @@ from mcd_seen.interface import register_command
 
 
 def on_info(server: PluginServerInterface, info: Info) -> None:
-    if info.is_from_server:
+    if info.is_from_server and config.identify_bot:
+        logger.debug('Join event found with on_info')
         psd = parse('{name}[{ip}] logged in with entity id {id} at {loc}', info.content)
         if psd is not None and verify_player_name(psd['name']):
-            player_name = bot_name(psd['name']) if psd['ip'] == 'local' and config.identify_bot else psd['name']
+            player_name = bot_name(psd['name']) if psd['ip'] == 'local' else psd['name']
             storage.player_joined(player_name)
-            server.as_plugin_server_interface()
+
+
+def on_player_joined(server: PluginServerInterface, player: str, info: Info = None):
+    if not config.identify_bot:
+        logger.debug('Join event found with on_player_joined')
+        storage.player_joined(player)
 
 
 def on_player_left(server: PluginServerInterface, player: str):
