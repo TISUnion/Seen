@@ -1,0 +1,19 @@
+{
+    "id": "mcd_seen",
+    "version": "1.2.2",
+    "name": "Seen",
+    "description": "Show laziness rank easily",
+    "author": [
+        "Pandaria",
+        "Fallen_Breath",
+        "Ra1ny_Yuki"
+    ],
+    "link": "https://github.com/TISUnion/Seen",
+    "dependencies": {
+        "mcdreforged": ">=2.1.0"
+    },
+
+    "resources": [
+        "lang"
+    ]
+}

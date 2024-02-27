@@ -1,1 +1,1 @@
-a plugin for MCDaemon
+a plugin for MCDR v2.0
